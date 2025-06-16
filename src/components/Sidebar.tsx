@@ -35,8 +35,12 @@ export const Sidebar = ({ currentPage, onPageChange }: SidebarProps) => {
     <div className="fixed left-0 top-0 h-full w-64 bg-slate-800 border-r border-slate-700 p-4">
       <div className="mb-8">
         <div className="flex items-center space-x-3 mb-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">M</span>
+          <div className="w-16 h-16 flex items-center justify-center">
+            <img 
+              src="/lovable-uploads/fd1303f1-809d-4b6d-b392-40ee35f46d05.png" 
+              alt="Maré Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
             <h2 className="font-bold text-lg text-white">Maré</h2>
