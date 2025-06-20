@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -10,6 +9,7 @@ export interface Produto {
   estoque: number;
   imagem?: string;
   categoria: string;
+  tatuador?: string;
   created_at: string;
   updated_at: string;
 }

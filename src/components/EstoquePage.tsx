@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,8 @@ export const EstoquePage = () => {
     nome: "",
     preco: "",
     estoque: "",
-    categoria: "bebida"
+    categoria: "bebida",
+    tatuador: ""
   });
 
   const filteredBebidas = bebidas.filter(produto =>
@@ -49,7 +49,8 @@ export const EstoquePage = () => {
       nome: formData.nome,
       preco: parseFloat(formData.preco),
       estoque: formData.categoria === 'tatuagem' ? 999 : parseInt(formData.estoque),
-      categoria: formData.categoria
+      categoria: formData.categoria,
+      ...(formData.categoria === 'tatuagem' && { tatuador: formData.tatuador || 'Não especificado' })
     };
 
     if (editingProduct) {
@@ -58,7 +59,7 @@ export const EstoquePage = () => {
       await adicionarProduto(produtoData);
     }
 
-    setFormData({ nome: "", preco: "", estoque: "", categoria: "bebida" });
+    setFormData({ nome: "", preco: "", estoque: "", categoria: "bebida", tatuador: "" });
     setEditingProduct(null);
     setDialogOpen(false);
   };
@@ -69,7 +70,8 @@ export const EstoquePage = () => {
       nome: produto.nome,
       preco: produto.preco.toString(),
       estoque: produto.categoria === 'tatuagem' ? "" : produto.estoque.toString(),
-      categoria: produto.categoria
+      categoria: produto.categoria,
+      tatuador: produto.tatuador || ""
     });
     setDialogOpen(true);
   };
@@ -103,7 +105,7 @@ export const EstoquePage = () => {
                   className="bg-cyan-600 hover:bg-cyan-700"
                   onClick={() => {
                     setEditingProduct(null);
-                    setFormData({ nome: "", preco: "", estoque: "", categoria: "bebida" });
+                    setFormData({ nome: "", preco: "", estoque: "", categoria: "bebida", tatuador: "" });
                   }}
                 >
                   <Plus size={16} className="mr-2" />
@@ -152,6 +154,18 @@ export const EstoquePage = () => {
                       required
                     />
                   </div>
+                  {formData.categoria === 'tatuagem' && (
+                    <div>
+                      <Label htmlFor="tatuador">Tatuador</Label>
+                      <Input
+                        id="tatuador"
+                        value={formData.tatuador}
+                        onChange={(e) => setFormData({...formData, tatuador: e.target.value})}
+                        className="bg-slate-700 border-slate-600 text-white"
+                        placeholder="Nome do tatuador"
+                      />
+                    </div>
+                  )}
                   {formData.categoria === 'bebida' && (
                     <div>
                       <Label htmlFor="estoque">Quantidade em Estoque</Label>
@@ -338,6 +352,7 @@ export const EstoquePage = () => {
                     <TableHead className="text-slate-400">Serviço</TableHead>
                     <TableHead className="text-slate-400">Preço</TableHead>
                     <TableHead className="text-slate-400">Tipo</TableHead>
+                    <TableHead className="text-slate-400">Tatuador</TableHead>
                     <TableHead className="text-slate-400">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -352,6 +367,9 @@ export const EstoquePage = () => {
                           <Badge className={`${status.color} text-white`}>
                             {status.text}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="text-white">
+                          {produto.tatuador || 'Não especificado'}
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
