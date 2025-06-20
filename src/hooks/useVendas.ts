@@ -81,17 +81,27 @@ export const useVendas = () => {
 
       if (itensError) throw itensError;
 
-      // Atualizar estoque dos produtos
+      // Atualizar estoque dos produtos usando RPC (Remote Procedure Call)
       for (const item of itens) {
-        const { error: estoqueError } = await supabase
+        const { data: produto } = await supabase
           .from('produtos')
-          .update({ 
-            estoque: supabase.sql`estoque - ${item.quantidade}`,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', item.produto_id);
+          .select('estoque')
+          .eq('id', item.produto_id)
+          .single();
 
-        if (estoqueError) throw estoqueError;
+        if (produto) {
+          const novoEstoque = produto.estoque - item.quantidade;
+          
+          const { error: estoqueError } = await supabase
+            .from('produtos')
+            .update({ 
+              estoque: novoEstoque,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', item.produto_id);
+
+          if (estoqueError) throw estoqueError;
+        }
       }
 
       // Adicionar transação financeira

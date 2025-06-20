@@ -26,7 +26,14 @@ export const useFinanceiro = () => {
         .order('data', { ascending: false });
 
       if (error) throw error;
-      setTransacoes(data || []);
+      
+      // Fazer type assertion para garantir que o tipo está correto
+      const transacoesFormatadas = (data || []).map(transacao => ({
+        ...transacao,
+        tipo: transacao.tipo as 'Receita' | 'Despesa'
+      }));
+      
+      setTransacoes(transacoesFormatadas);
     } catch (error) {
       console.error('Erro ao buscar transações:', error);
       toast({
@@ -49,12 +56,18 @@ export const useFinanceiro = () => {
 
       if (error) throw error;
       
-      setTransacoes(prev => [data, ...prev]);
+      // Fazer type assertion para garantir que o tipo está correto
+      const transacaoFormatada = {
+        ...data,
+        tipo: data.tipo as 'Receita' | 'Despesa'
+      };
+      
+      setTransacoes(prev => [transacaoFormatada, ...prev]);
       toast({
         title: "Sucesso",
         description: "Transação adicionada com sucesso!",
       });
-      return data;
+      return transacaoFormatada;
     } catch (error) {
       console.error('Erro ao adicionar transação:', error);
       toast({
