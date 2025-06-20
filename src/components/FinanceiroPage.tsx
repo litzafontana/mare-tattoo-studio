@@ -42,6 +42,13 @@ export const FinanceiroPage = () => {
     { name: "Aluguel", value: transacoes.filter(t => t.categoria === "Aluguel").reduce((acc, t) => acc + t.valor, 0), color: "#f97316" },
   ].filter(item => item.value > 0);
 
+  // Dados para evolução mensal
+  const evoluacaoMensal = [
+    { mes: "Nov", receitas: 2400, despesas: 1200 },
+    { mes: "Dez", receitas: 3200, despesas: 1400 },
+    { mes: "Jan", receitas: 2800, despesas: 1600 },
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -269,40 +276,84 @@ export const FinanceiroPage = () => {
       </Card>
 
       {/* Gráficos */}
-      {pieData.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-slate-800 border-slate-700">
-            <CardHeader>
-              <CardTitle className="text-white">Distribuição por Categoria</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1e293b', 
-                      border: '1px solid #475569',
-                      borderRadius: '8px',
-                      color: 'white'
-                    }} 
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="bg-slate-800 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-white">Distribuição por Categoria</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1e293b', 
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: 'white'
+                  }} 
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-800 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-white">Evolução Mensal</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={evoluacaoMensal}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                <XAxis 
+                  dataKey="mes" 
+                  stroke="#94a3b8"
+                  fontSize={12}
+                />
+                <YAxis 
+                  stroke="#94a3b8"
+                  fontSize={12}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1e293b', 
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: 'white'
+                  }} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="receitas" 
+                  stroke="#06b6d4" 
+                  strokeWidth={3}
+                  dot={{ fill: '#06b6d4', strokeWidth: 2, r: 4 }}
+                  name="Receitas"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="despesas" 
+                  stroke="#ef4444" 
+                  strokeWidth={3}
+                  dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
+                  name="Despesas"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Tabela de lançamentos */}
       <Card className="bg-slate-800 border-slate-700">
