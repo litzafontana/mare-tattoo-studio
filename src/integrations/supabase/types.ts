@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      agendamentos: {
+        Row: {
+          cliente_email: string | null
+          cliente_nome: string | null
+          cliente_telefone: string | null
+          cor: string | null
+          created_at: string
+          data_fim: string
+          data_inicio: string
+          descricao: string | null
+          google_event_id: string | null
+          id: string
+          status: string | null
+          tatuador: string | null
+          titulo: string
+        }
+        Insert: {
+          cliente_email?: string | null
+          cliente_nome?: string | null
+          cliente_telefone?: string | null
+          cor?: string | null
+          created_at?: string
+          data_fim: string
+          data_inicio: string
+          descricao?: string | null
+          google_event_id?: string | null
+          id?: string
+          status?: string | null
+          tatuador?: string | null
+          titulo: string
+        }
+        Update: {
+          cliente_email?: string | null
+          cliente_nome?: string | null
+          cliente_telefone?: string | null
+          cor?: string | null
+          created_at?: string
+          data_fim?: string
+          data_inicio?: string
+          descricao?: string | null
+          google_event_id?: string | null
+          id?: string
+          status?: string | null
+          tatuador?: string | null
+          titulo?: string
+        }
+        Relationships: []
+      }
       itens_venda: {
         Row: {
           created_at: string

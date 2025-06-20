@@ -1,5 +1,4 @@
-
-import { DollarSign, MessageCircle, Package, ShoppingCart } from "lucide-react";
+import { Calendar, DollarSign, MessageCircle, Package, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -12,6 +11,11 @@ const menuItems = [
     name: "Financeiro",
     icon: DollarSign,
     description: "Controle financeiro",
+  },
+  {
+    name: "Agenda",
+    icon: Calendar,
+    description: "Agendamentos",
   },
   {
     name: "Conversas",

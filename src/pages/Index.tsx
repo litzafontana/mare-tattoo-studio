@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { FinanceiroPage } from "@/components/FinanceiroPage";
+import { AgendaPage } from "@/components/AgendaPage";
 import { ConversasPage } from "@/components/ConversasPage";
 import { EstoquePage } from "@/components/EstoquePage";
 import { VendasPage } from "@/components/VendasPage";
@@ -13,6 +14,8 @@ const Index = () => {
     switch (currentPage) {
       case "Financeiro":
         return <FinanceiroPage />;
+      case "Agenda":
+        return <AgendaPage />;
       case "Conversas":
         return <ConversasPage />;
       case "Estoque":
