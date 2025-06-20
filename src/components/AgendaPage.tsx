@@ -52,7 +52,7 @@ export const AgendaPage = () => {
             <Calendar className="w-4 h-4 mr-2" />
             Calendário
           </Button>
-          <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} size="sm" className="text-slate-400 bg-gray-200 hover:bg-gray-100">
+          <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} size="sm" className="font-thin bg-transparent text-gray-400">
             Lista
           </Button>
           <Button onClick={handleCreateAgendamento} className="bg-cyan-600 hover:bg-cyan-700 px-0 mx-0 font-normal">
