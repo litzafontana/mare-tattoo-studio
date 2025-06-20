@@ -4,21 +4,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ShoppingCart, Plus, Minus, Trash2, Coffee, Palette } from "lucide-react";
 import { useProdutos } from "@/hooks/useProdutos";
 import { useVendas, ItemVenda } from "@/hooks/useVendas";
 import { toast } from "@/hooks/use-toast";
 
 export const VendasPage = () => {
-  const { produtos, loading: loadingProdutos } = useProdutos();
+  const { produtos, loading: loadingProdutos, bebidas, tatuagens } = useProdutos();
   const { criarVenda, loading: loadingVendas } = useVendas();
   const [carrinho, setCarrinho] = useState<ItemVenda[]>([]);
+  const [activeTab, setActiveTab] = useState("bebidas");
 
   const adicionarAoCarrinho = (produto: any) => {
     const itemExistente = carrinho.find(item => item.produto_id === produto.id);
     
     if (itemExistente) {
-      if (itemExistente.quantidade < produto.estoque) {
+      if (produto.categoria === 'tatuagem') {
+        // Para tatuagens, permitir múltiplas sessões
+        setCarrinho(carrinho.map(item =>
+          item.produto_id === produto.id
+            ? { 
+                ...item, 
+                quantidade: item.quantidade + 1,
+                subtotal: item.preco_unitario * (item.quantidade + 1)
+              }
+            : item
+        ));
+      } else if (itemExistente.quantidade < produto.estoque) {
         setCarrinho(carrinho.map(item =>
           item.produto_id === produto.id
             ? { 
@@ -54,7 +67,8 @@ export const VendasPage = () => {
       return;
     }
     
-    if (produto && novaQuantidade > produto.estoque) {
+    // Para tatuagens, não verificar estoque
+    if (produto && produto.categoria === 'bebida' && novaQuantidade > produto.estoque) {
       toast({
         title: "Estoque insuficiente",
         description: "Não há estoque suficiente para esta quantidade.",
@@ -115,40 +129,87 @@ export const VendasPage = () => {
           <CardHeader>
             <CardTitle className="text-white flex items-center space-x-2">
               <ShoppingCart size={20} />
-              <span>Produtos Disponíveis</span>
+              <span>Produtos e Serviços Disponíveis</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {produtos.map((produto) => (
-                <Card key={produto.id} className="bg-slate-700 border-slate-600">
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 bg-slate-600 rounded-lg flex items-center justify-center">
-                        <ShoppingCart size={24} className="text-slate-400" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-white font-medium">{produto.nome}</h3>
-                        <p className="text-cyan-400 font-bold">R$ {produto.preco.toFixed(2)}</p>
-                        <div className="flex items-center justify-between mt-2">
-                          <Badge variant={produto.estoque <= 5 ? "destructive" : "default"}>
-                            {produto.estoque} em estoque
-                          </Badge>
-                          <Button 
-                            size="sm" 
-                            onClick={() => adicionarAoCarrinho(produto)}
-                            disabled={produto.estoque === 0}
-                            className="bg-cyan-600 hover:bg-cyan-700"
-                          >
-                            <Plus size={14} />
-                          </Button>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-slate-700 mb-4">
+                <TabsTrigger value="bebidas" className="text-white data-[state=active]:bg-cyan-600">
+                  <Coffee size={16} className="mr-2" />
+                  Bebidas
+                </TabsTrigger>
+                <TabsTrigger value="tatuagens" className="text-white data-[state=active]:bg-purple-600">
+                  <Palette size={16} className="mr-2" />
+                  Serviços
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="bebidas">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {bebidas.map((produto) => (
+                    <Card key={produto.id} className="bg-slate-700 border-slate-600">
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-16 h-16 bg-slate-600 rounded-lg flex items-center justify-center">
+                            <Coffee size={24} className="text-cyan-400" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-white font-medium">{produto.nome}</h3>
+                            <p className="text-cyan-400 font-bold">R$ {produto.preco.toFixed(2)}</p>
+                            <div className="flex items-center justify-between mt-2">
+                              <Badge variant={produto.estoque <= 5 ? "destructive" : "default"}>
+                                {produto.estoque} em estoque
+                              </Badge>
+                              <Button 
+                                size="sm" 
+                                onClick={() => adicionarAoCarrinho(produto)}
+                                disabled={produto.estoque === 0}
+                                className="bg-cyan-600 hover:bg-cyan-700"
+                              >
+                                <Plus size={14} />
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="tatuagens">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {tatuagens.map((produto) => (
+                    <Card key={produto.id} className="bg-slate-700 border-slate-600">
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-16 h-16 bg-slate-600 rounded-lg flex items-center justify-center">
+                            <Palette size={24} className="text-purple-400" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-white font-medium">{produto.nome}</h3>
+                            <p className="text-purple-400 font-bold">R$ {produto.preco.toFixed(2)}</p>
+                            <div className="flex items-center justify-between mt-2">
+                              <Badge className="bg-purple-600 text-white">
+                                Serviço
+                              </Badge>
+                              <Button 
+                                size="sm" 
+                                onClick={() => adicionarAoCarrinho(produto)}
+                                className="bg-purple-600 hover:bg-purple-700"
+                              >
+                                <Plus size={14} />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
@@ -174,7 +235,14 @@ export const VendasPage = () => {
                   return (
                     <div key={item.produto_id} className="bg-slate-700 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-white font-medium text-sm">{produto.nome}</h4>
+                        <div className="flex items-center space-x-2">
+                          {produto.categoria === 'tatuagem' ? (
+                            <Palette size={16} className="text-purple-400" />
+                          ) : (
+                            <Coffee size={16} className="text-cyan-400" />
+                          )}
+                          <h4 className="text-white font-medium text-sm">{produto.nome}</h4>
+                        </div>
                         <Button 
                           size="sm" 
                           variant="ghost" 
@@ -202,7 +270,7 @@ export const VendasPage = () => {
                             onChange={(e) => alterarQuantidade(item.produto_id, parseInt(e.target.value) || 0)}
                             className="w-16 text-center bg-slate-600 border-slate-500 text-white"
                             min="1"
-                            max={produto.estoque}
+                            max={produto.categoria === 'tatuagem' ? 999 : produto.estoque}
                           />
                           
                           <Button 
@@ -215,7 +283,7 @@ export const VendasPage = () => {
                           </Button>
                         </div>
                         
-                        <p className="text-cyan-400 font-bold">
+                        <p className={`font-bold ${produto.categoria === 'tatuagem' ? 'text-purple-400' : 'text-cyan-400'}`}>
                           R$ {item.subtotal.toFixed(2)}
                         </p>
                       </div>
@@ -226,7 +294,7 @@ export const VendasPage = () => {
                 <div className="border-t border-slate-700 pt-4">
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-white font-bold text-lg">Total:</span>
-                    <span className="text-cyan-400 font-bold text-xl">
+                    <span className="text-green-400 font-bold text-xl">
                       R$ {calcularTotal().toFixed(2)}
                     </span>
                   </div>

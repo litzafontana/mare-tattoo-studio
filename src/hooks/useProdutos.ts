@@ -23,7 +23,8 @@ export const useProdutos = () => {
       const { data, error } = await supabase
         .from('produtos')
         .select('*')
-        .order('nome');
+        .order('categoria', { ascending: true })
+        .order('nome', { ascending: true });
 
       if (error) throw error;
       setProdutos(data || []);
@@ -52,14 +53,14 @@ export const useProdutos = () => {
       setProdutos(prev => [...prev, data]);
       toast({
         title: "Sucesso",
-        description: "Produto adicionado com sucesso!",
+        description: `${produto.categoria === 'tatuagem' ? 'Serviço' : 'Produto'} adicionado com sucesso!`,
       });
       return data;
     } catch (error) {
       console.error('Erro ao adicionar produto:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível adicionar o produto.",
+        description: `Não foi possível adicionar o ${produto.categoria === 'tatuagem' ? 'serviço' : 'produto'}.`,
         variant: "destructive",
       });
     }
@@ -79,14 +80,14 @@ export const useProdutos = () => {
       setProdutos(prev => prev.map(p => p.id === id ? data : p));
       toast({
         title: "Sucesso",
-        description: "Produto atualizado com sucesso!",
+        description: `${data.categoria === 'tatuagem' ? 'Serviço' : 'Produto'} atualizado com sucesso!`,
       });
       return data;
     } catch (error) {
       console.error('Erro ao atualizar produto:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível atualizar o produto.",
+        description: `Não foi possível atualizar o ${updates.categoria === 'tatuagem' ? 'serviço' : 'produto'}.`,
         variant: "destructive",
       });
     }
@@ -94,6 +95,7 @@ export const useProdutos = () => {
 
   const removerProduto = async (id: string) => {
     try {
+      const produto = produtos.find(p => p.id === id);
       const { error } = await supabase
         .from('produtos')
         .delete()
@@ -104,17 +106,21 @@ export const useProdutos = () => {
       setProdutos(prev => prev.filter(p => p.id !== id));
       toast({
         title: "Sucesso",
-        description: "Produto removido com sucesso!",
+        description: `${produto?.categoria === 'tatuagem' ? 'Serviço' : 'Produto'} removido com sucesso!`,
       });
     } catch (error) {
       console.error('Erro ao remover produto:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível remover o produto.",
+        description: "Não foi possível remover o item.",
         variant: "destructive",
       });
     }
   };
+
+  // Funções utilitárias para filtrar por categoria
+  const getBebidas = () => produtos.filter(p => p.categoria === 'bebida');
+  const getTatuagens = () => produtos.filter(p => p.categoria === 'tatuagem');
 
   useEffect(() => {
     fetchProdutos();
@@ -126,6 +132,8 @@ export const useProdutos = () => {
     adicionarProduto,
     atualizarProduto,
     removerProduto,
-    refetch: fetchProdutos
+    refetch: fetchProdutos,
+    bebidas: getBebidas(),
+    tatuagens: getTatuagens()
   };
 };
