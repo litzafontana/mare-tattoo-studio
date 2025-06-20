@@ -48,11 +48,11 @@ export const AgendaPage = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant={viewMode === 'calendar' ? 'default' : 'outline'} onClick={() => setViewMode('calendar')} size="sm" className="text-slate-50 bg-slate-400 hover:bg-slate-300">
+          <Button variant={viewMode === 'calendar' ? 'default' : 'outline'} onClick={() => setViewMode('calendar')} size="sm" className="text-slate-50 bg-gray-700 hover:bg-gray-600">
             <Calendar className="w-4 h-4 mr-2" />
             Calendário
           </Button>
-          <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} size="sm" className="bg-slate-500 hover:bg-slate-400 text-gray-50">
+          <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} size="sm" className="text-slate-400 bg-gray-200 hover:bg-gray-100">
             Lista
           </Button>
           <Button onClick={handleCreateAgendamento} className="bg-cyan-600 hover:bg-cyan-700 px-0 mx-0 font-normal">
