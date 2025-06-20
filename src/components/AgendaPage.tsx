@@ -48,7 +48,7 @@ export const AgendaPage = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant={viewMode === 'calendar' ? 'default' : 'outline'} onClick={() => setViewMode('calendar')} size="sm" className="text-slate-50 bg-gray-950 hover:bg-gray-800">
+          <Button variant={viewMode === 'calendar' ? 'default' : 'outline'} onClick={() => setViewMode('calendar')} size="sm" className="text-slate-50 bg-slate-400 hover:bg-slate-300">
             <Calendar className="w-4 h-4 mr-2" />
             Calendário
           </Button>
