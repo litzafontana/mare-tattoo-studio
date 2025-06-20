@@ -5,57 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Package } from "lucide-react";
-
-const mockProdutos = [
-  {
-    id: 1,
-    nome: "Coca-Cola 350ml",
-    preco: 5.50,
-    estoque: 24,
-    imagem: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 2,
-    nome: "Água 500ml",
-    preco: 3.00,
-    estoque: 18,
-    imagem: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 3,
-    nome: "Suco Natural 300ml",
-    preco: 8.00,
-    estoque: 12,
-    imagem: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 4,
-    nome: "Cerveja Artesanal",
-    preco: 12.00,
-    estoque: 6,
-    imagem: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 5,
-    nome: "Energético 250ml",
-    preco: 7.50,
-    estoque: 8,
-    imagem: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: 6,
-    nome: "Café Expresso",
-    preco: 4.00,
-    estoque: 30,
-    imagem: "/placeholder.svg?height=40&width=40",
-  },
-];
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Search, Plus, Package, Edit, Trash2 } from "lucide-react";
+import { useProdutos } from "@/hooks/useProdutos";
 
 export const EstoquePage = () => {
+  const { produtos, loading, adicionarProduto, atualizarProduto, removerProduto } = useProdutos();
   const [searchTerm, setSearchTerm] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    nome: "",
+    preco: "",
+    estoque: "",
+    categoria: "bebida"
+  });
 
-  const filteredProdutos = mockProdutos.filter(produto =>
+  const filteredProdutos = produtos.filter(produto =>
     produto.nome.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -65,9 +32,54 @@ export const EstoquePage = () => {
     return { color: "bg-green-600", text: "Alto" };
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const produtoData = {
+      nome: formData.nome,
+      preco: parseFloat(formData.preco),
+      estoque: parseInt(formData.estoque),
+      categoria: formData.categoria
+    };
+
+    if (editingProduct) {
+      await atualizarProduto(editingProduct.id, produtoData);
+    } else {
+      await adicionarProduto(produtoData);
+    }
+
+    setFormData({ nome: "", preco: "", estoque: "", categoria: "bebida" });
+    setEditingProduct(null);
+    setDialogOpen(false);
+  };
+
+  const handleEdit = (produto: any) => {
+    setEditingProduct(produto);
+    setFormData({
+      nome: produto.nome,
+      preco: produto.preco.toString(),
+      estoque: produto.estoque.toString(),
+      categoria: produto.categoria
+    });
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Tem certeza que deseja remover este produto?')) {
+      await removerProduto(id);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-white">Carregando...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Header com busca e ações */}
       <Card className="bg-slate-800 border-slate-700">
         <CardHeader>
           <CardTitle className="text-white flex items-center justify-between">
@@ -75,10 +87,75 @@ export const EstoquePage = () => {
               <Package size={20} />
               <span>Gestão de Estoque</span>
             </div>
-            <Button className="bg-cyan-600 hover:bg-cyan-700">
-              <Plus size={16} className="mr-2" />
-              Adicionar Bebida
-            </Button>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  className="bg-cyan-600 hover:bg-cyan-700"
+                  onClick={() => {
+                    setEditingProduct(null);
+                    setFormData({ nome: "", preco: "", estoque: "", categoria: "bebida" });
+                  }}
+                >
+                  <Plus size={16} className="mr-2" />
+                  Adicionar Bebida
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-800 border-slate-700 text-white">
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingProduct ? 'Editar Produto' : 'Adicionar Novo Produto'}
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <Label htmlFor="nome">Nome do Produto</Label>
+                    <Input
+                      id="nome"
+                      value={formData.nome}
+                      onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                      className="bg-slate-700 border-slate-600 text-white"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="preco">Preço (R$)</Label>
+                    <Input
+                      id="preco"
+                      type="number"
+                      step="0.01"
+                      value={formData.preco}
+                      onChange={(e) => setFormData({...formData, preco: e.target.value})}
+                      className="bg-slate-700 border-slate-600 text-white"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="estoque">Quantidade em Estoque</Label>
+                    <Input
+                      id="estoque"
+                      type="number"
+                      value={formData.estoque}
+                      onChange={(e) => setFormData({...formData, estoque: e.target.value})}
+                      className="bg-slate-700 border-slate-600 text-white"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="categoria">Categoria</Label>
+                    <Input
+                      id="categoria"
+                      value={formData.categoria}
+                      onChange={(e) => setFormData({...formData, categoria: e.target.value})}
+                      className="bg-slate-700 border-slate-600 text-white"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700">
+                    {editingProduct ? 'Atualizar' : 'Adicionar'} Produto
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -96,14 +173,13 @@ export const EstoquePage = () => {
         </CardContent>
       </Card>
 
-      {/* Cards resumo */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-slate-800 border-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-400 text-sm">Total Produtos</p>
-                <p className="text-2xl font-bold text-white">{mockProdutos.length}</p>
+                <p className="text-2xl font-bold text-white">{produtos.length}</p>
               </div>
               <div className="w-10 h-10 bg-cyan-600/20 rounded-lg flex items-center justify-center">
                 <Package size={20} className="text-cyan-400" />
@@ -118,7 +194,7 @@ export const EstoquePage = () => {
               <div>
                 <p className="text-slate-400 text-sm">Estoque Total</p>
                 <p className="text-2xl font-bold text-white">
-                  {mockProdutos.reduce((acc, produto) => acc + produto.estoque, 0)}
+                  {produtos.reduce((acc, produto) => acc + produto.estoque, 0)}
                 </p>
               </div>
               <div className="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
@@ -134,7 +210,7 @@ export const EstoquePage = () => {
               <div>
                 <p className="text-slate-400 text-sm">Estoque Baixo</p>
                 <p className="text-2xl font-bold text-red-400">
-                  {mockProdutos.filter(p => p.estoque <= 5).length}
+                  {produtos.filter(p => p.estoque <= 5).length}
                 </p>
               </div>
               <div className="w-10 h-10 bg-red-600/20 rounded-lg flex items-center justify-center">
@@ -150,7 +226,7 @@ export const EstoquePage = () => {
               <div>
                 <p className="text-slate-400 text-sm">Valor Total</p>
                 <p className="text-2xl font-bold text-white">
-                  R$ {mockProdutos.reduce((acc, produto) => acc + (produto.preco * produto.estoque), 0).toFixed(2)}
+                  R$ {produtos.reduce((acc, produto) => acc + (produto.preco * produto.estoque), 0).toFixed(2)}
                 </p>
               </div>
               <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
@@ -161,7 +237,6 @@ export const EstoquePage = () => {
         </Card>
       </div>
 
-      {/* Tabela de produtos */}
       <Card className="bg-slate-800 border-slate-700">
         <CardHeader>
           <CardTitle className="text-white">Produtos em Estoque</CardTitle>
@@ -170,7 +245,6 @@ export const EstoquePage = () => {
           <Table>
             <TableHeader>
               <TableRow className="border-slate-700">
-                <TableHead className="text-slate-400">Imagem</TableHead>
                 <TableHead className="text-slate-400">Nome</TableHead>
                 <TableHead className="text-slate-400">Preço</TableHead>
                 <TableHead className="text-slate-400">Estoque</TableHead>
@@ -184,13 +258,6 @@ export const EstoquePage = () => {
                 const status = getEstoqueStatus(produto.estoque);
                 return (
                   <TableRow key={produto.id} className="border-slate-700">
-                    <TableCell>
-                      <img 
-                        src={produto.imagem} 
-                        alt={produto.nome}
-                        className="w-10 h-10 rounded-lg object-cover bg-slate-700"
-                      />
-                    </TableCell>
                     <TableCell className="text-white font-medium">{produto.nome}</TableCell>
                     <TableCell className="text-white">R$ {produto.preco.toFixed(2)}</TableCell>
                     <TableCell className="text-white">{produto.estoque} un</TableCell>
@@ -204,11 +271,21 @@ export const EstoquePage = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        <Button size="sm" variant="outline" className="bg-slate-700 border-slate-600 text-white">
-                          Editar
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="bg-slate-700 border-slate-600 text-white"
+                          onClick={() => handleEdit(produto)}
+                        >
+                          <Edit size={14} />
                         </Button>
-                        <Button size="sm" variant="outline" className="bg-slate-700 border-slate-600 text-white">
-                          Remover
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="bg-slate-700 border-slate-600 text-red-400 hover:text-red-300"
+                          onClick={() => handleDelete(produto.id)}
+                        >
+                          <Trash2 size={14} />
                         </Button>
                       </div>
                     </TableCell>

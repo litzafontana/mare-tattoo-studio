@@ -9,7 +9,141 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      itens_venda: {
+        Row: {
+          created_at: string
+          id: string
+          preco_unitario: number
+          produto_id: string
+          quantidade: number
+          subtotal: number
+          venda_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          preco_unitario: number
+          produto_id: string
+          quantidade: number
+          subtotal: number
+          venda_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          preco_unitario?: number
+          produto_id?: string
+          quantidade?: number
+          subtotal?: number
+          venda_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_venda_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itens_venda_venda_id_fkey"
+            columns: ["venda_id"]
+            isOneToOne: false
+            referencedRelation: "vendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      produtos: {
+        Row: {
+          categoria: string | null
+          created_at: string
+          estoque: number
+          id: string
+          imagem: string | null
+          nome: string
+          preco: number
+          updated_at: string
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string
+          estoque?: number
+          id?: string
+          imagem?: string | null
+          nome: string
+          preco: number
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string
+          estoque?: number
+          id?: string
+          imagem?: string | null
+          nome?: string
+          preco?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transacoes_financeiras: {
+        Row: {
+          categoria: string
+          created_at: string
+          data: string
+          descricao: string
+          id: string
+          tatuador: string | null
+          tipo: string
+          valor: number
+        }
+        Insert: {
+          categoria: string
+          created_at?: string
+          data?: string
+          descricao: string
+          id?: string
+          tatuador?: string | null
+          tipo: string
+          valor: number
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          data?: string
+          descricao?: string
+          id?: string
+          tatuador?: string | null
+          tipo?: string
+          valor?: number
+        }
+        Relationships: []
+      }
+      vendas: {
+        Row: {
+          created_at: string
+          data: string
+          id: string
+          status: string | null
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          id?: string
+          status?: string | null
+          total: number
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          id?: string
+          status?: string | null
+          total?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
