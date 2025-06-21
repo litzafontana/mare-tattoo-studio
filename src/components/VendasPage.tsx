@@ -161,12 +161,12 @@ export const VendasPage = () => {
                           </div>
                           <div className="flex-1">
                             <h3 className="text-white font-medium">{produto.nome}</h3>
-                            <p className="font-bold text-zinc-400">R$ {produto.preco.toFixed(2)}</p>
-                            <div className="flex items-center justify-between mt-2">
-                              <Badge className="text-white bg-zinc-500">
+                            <p className="font-bold text-purple-600">R$ {produto.preco.toFixed(2)}</p>
+                            <div className="flex items-center justify-between mt-2 bg-inherit">
+                              <Badge className="text-white bg-purple-600">
                                 Serviço
                               </Badge>
-                              <Button size="sm" onClick={() => adicionarAoCarrinho(produto)} className="bg-zinc-500 hover:bg-zinc-400">
+                              <Button size="sm" onClick={() => adicionarAoCarrinho(produto)} className="bg-zinc-500 hover:bg-zinc-400 text-center">
                                 <Plus size={14} />
                               </Button>
                             </div>
